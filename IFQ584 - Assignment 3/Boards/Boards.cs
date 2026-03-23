@@ -1,6 +1,4 @@
-using BoardGames.Interfaces;
-
-namespace BoardGames.Boards
+namespace BoardGames
 {
     // GridBoard 
     public class GridBoard : IBoard
