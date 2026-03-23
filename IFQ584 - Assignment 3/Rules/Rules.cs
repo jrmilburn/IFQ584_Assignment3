@@ -1,8 +1,4 @@
-using BoardGames.Interfaces;
-using BoardGames.Core;
-using BoardGames.Boards;
-
-namespace BoardGames.Rules
+namespace BoardGames
 {
     //  GomokuRules 
     public class GomokuRules : IRules
