@@ -1,10 +1,4 @@
-using BoardGames.Core;
-using BoardGames.Games;
-using BoardGames.Interfaces;
-using BoardGames.Players;
-using BoardGames.Services;
-
-namespace BoardGames.Controllers
+namespace BoardGames
 {
     public class GameController
     {
@@ -29,7 +23,7 @@ namespace BoardGames.Controllers
             while (true)
             {
                 _game.RenderBoard();
-                Console.WriteLine($"\n  Turn: Player {_game.CurrentPlayer.Id}");
+                Console.WriteLine($"\n  Turn: Player {_game.CurrentPlayer.ID}");
 
                 var result = _game.CheckResult();
                 if (result != GameResult.NotFinished)
@@ -58,7 +52,6 @@ namespace BoardGames.Controllers
                 if (!HandleCommand(cmd)) break; // quit
             }
         }
-
         private bool HandleCommand(Command cmd)
         {
             switch (cmd.Type)
@@ -116,7 +109,7 @@ namespace BoardGames.Controllers
                 return;
             }
 
-            string valueOrPiece = _game.CurrentPlayer.Id == 1 ? "X" : "O";
+            string valueOrPiece = _game.CurrentPlayer.ID == 1 ? "X" : "O";
             int boardIndex = 0;
 
             if (args.Length >= 4)
@@ -128,7 +121,7 @@ namespace BoardGames.Controllers
                     boardIndex = bi;
             }
 
-            var move = new Move(_game.CurrentPlayer.Id, col, row, valueOrPiece, boardIndex);
+            var move = new Move(_game.CurrentPlayer.ID, col, row, valueOrPiece, boardIndex);
 
             if (_game.ApplyMove(move))
             {
@@ -173,10 +166,10 @@ namespace BoardGames.Controllers
             switch (result)
             {
                 case GameResult.Win:
-                    Console.WriteLine($"  🎉 Player {_game.CurrentPlayer.Id} wins!");
+                    Console.WriteLine($"  🎉 Player {_game.CurrentPlayer.ID} wins!");
                     break;
                 case GameResult.Loss:
-                    Console.WriteLine($"  Player {_game.CurrentPlayer.Id} loses (misère).");
+                    Console.WriteLine($"  Player {_game.CurrentPlayer.ID} loses (misère).");
                     break;
                 case GameResult.Tie:
                     Console.WriteLine("  It's a tie!");
