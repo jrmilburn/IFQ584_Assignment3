@@ -1,11 +1,27 @@
-using BoardGames.Interfaces;
-using BoardGames.Core;
-using BoardGames.Boards;
-using BoardGames.Rules;
-using BoardGames.Players;
-
-namespace BoardGames.Games
+namespace BoardGames
 {
+	public abstract class Game
+	{
+		protected IBoard Board { get; set; } = null!;
+		protected IRules Rules { get; set; } = null!;
+		protected Player[] Players { get; set; } = null!;
+
+		public int CurrentPlayerIndex { get; set; }
+		public Player CurrentPlayer => Players[CurrentPlayerIndex];
+		public string Mode { get; protected set; } = "";
+		public abstract string GameTypeId { get; }
+
+		public abstract List<Move> GetLegalMoves();
+		public abstract bool ApplyMove(Move move);
+		public abstract bool UndoMove(Move move);
+		public abstract GameResult CheckResult();
+		public abstract void RenderBoard();
+		public abstract GameState Serialise();
+		public abstract void RestoreFrom(GameState gs);
+
+		public void NextPlayer() =>
+			CurrentPlayerIndex = (CurrentPlayerIndex + 1) % Players.Length;
+	}
     // GameMode 
     public enum GameMode { HumanVsHuman, HumanVsComputer }
 
@@ -24,12 +40,12 @@ namespace BoardGames.Games
             Board = new GridBoard(boardSize);
             Rules = new GomokuRules(5);
             Players = mode == GameMode.HumanVsHuman
-                ? new IPlayer[] { new HumanPlayer(1, "p1"), new HumanPlayer(2, "p2") }
-                : new IPlayer[] { new HumanPlayer(1, "p1"), new ComputerPlayer(2) };
+                ? new Player[] { new HumanPlayer(1, "p1"), new HumanPlayer(2, "p2") }
+                : new Player[] { new HumanPlayer(1, "p1"), new ComputerPlayer(2) };
         }
 
         public override List<Move> GetLegalMoves() =>
-            Rules.LegalMoves(Board, CurrentPlayer.Id);
+            Rules.LegalMoves(Board, CurrentPlayer.ID);
 
         public override bool ApplyMove(Move move)
         {
@@ -76,12 +92,12 @@ namespace BoardGames.Games
             Board = new NumericBoard();
             Rules = new NumericalTTTRules();
             Players = mode == GameMode.HumanVsHuman
-                ? new IPlayer[] { new HumanPlayer(1, "p1"), new HumanPlayer(2, "p2") }
-                : new IPlayer[] { new HumanPlayer(1, "p1"), new ComputerPlayer(2) };
+                ? new Player[] { new HumanPlayer(1, "p1"), new HumanPlayer(2, "p2") }
+                : new Player[] { new HumanPlayer(1, "p1"), new ComputerPlayer(2) };
         }
 
         public override List<Move> GetLegalMoves() =>
-            Rules.LegalMoves(Board, CurrentPlayer.Id);
+            Rules.LegalMoves(Board, CurrentPlayer.ID);
 
         public override bool ApplyMove(Move move)
         {
@@ -129,12 +145,12 @@ namespace BoardGames.Games
             Board = new MultiBoard();
             Rules = new NotaktoRules();
             Players = mode == GameMode.HumanVsHuman
-                ? new IPlayer[] { new HumanPlayer(1, "p1"), new HumanPlayer(2, "p2") }
-                : new IPlayer[] { new HumanPlayer(1, "p1"), new ComputerPlayer(2) };
+                ? new Player[] { new HumanPlayer(1, "p1"), new HumanPlayer(2, "p2") }
+                : new Player[] { new HumanPlayer(1, "p1"), new ComputerPlayer(2) };
         }
 
         public override List<Move> GetLegalMoves() =>
-            Rules.LegalMoves(Board, CurrentPlayer.Id);
+            Rules.LegalMoves(Board, CurrentPlayer.ID);
 
         public override bool ApplyMove(Move move)
         {
