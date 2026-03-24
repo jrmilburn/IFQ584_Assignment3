@@ -1,51 +1,61 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿//Contains history of move records
 
-namespace BoardGames
+class MoveHistory
 {
-	public class MoveHistory
-	{
-		private readonly Stack<Move> _undo = new();
-		private readonly Stack<Move> _redo = new();
+    private Stack<MoveRecord> doneMoves;
+    private Stack<MoveRecord> undoneMoves;
+    private int currentMoveIndex;
+    public MoveHistory()
+    {
+        
+    }
+    public int CurrentMoveIndex => currentMoveIndex;
+    public void Add(MoveRecord record){
+    }
+    public void Undo()
+    {
+        currentMoveIndex -= 1;
+    }
 
-		public int UndoCount => _undo.Count;
-		public int RedoCount => _redo.Count;
-		public Move? UndoTop => _undo.TryPeek(out var m) ? m : null;
+    public void Redo()
+    {
+        currentMoveIndex += 1;
+    }
 
-		public void DoMove(Move m)
-		{
-			_undo.Push(m);
-			_redo.Clear();          // new move clears redo
-		}
+    //When a move is undone and then a different move is played,
+    // the remainder of the stack should be cleared
+    public void ClearRedo()
+    {
+        for(int i = 0; i < doneMoves.Count(); ++i)
+        {
+            if(i > currentMoveIndex)
+            {
+                //Implement clearing logic
+            }
+        }
+    }
 
-		public Move? Undo()
-		{
-			if (_undo.Count == 0) return null;
-			var m = _undo.Pop();
-			_redo.Push(m);
-			return m;
-		}
+    public bool CanUndo()
+    {
+        //If a move has been performed, undo becomes available
+        if(currentMoveIndex > 0)
+        {
+            return true;
+        }
 
-		public Move? Redo()
-		{
-			if (_redo.Count == 0) return null;
-			var m = _redo.Pop();
-			_undo.Push(m);
-			return m;
-		}
+        return false;
+    }
 
-		public void ClearRedo() => _redo.Clear();
+    public bool CanRedo()
+    {
+        //Redo becomes available once a move has been undone
+        //In practice this means the stack length is greater than the current index
+        int stackLength = doneMoves.Count();
+        if(currentMoveIndex < stackLength)
+        {
+            return true;
+        }
 
-		public List<Move> UndoMoves() => _undo.ToList();
-		public List<Move> RedoMoves() => _redo.ToList();
-
-		public void Restore(List<Move> undoMoves, List<Move> redoMoves)
-		{
-			_undo.Clear(); _redo.Clear();
-			// Stacks push in reverse
-			foreach (var m in Enumerable.Reverse(undoMoves)) _undo.Push(m);
-			foreach (var m in Enumerable.Reverse(redoMoves)) _redo.Push(m);
-		}
-	}
+        return false;
+    }
 }

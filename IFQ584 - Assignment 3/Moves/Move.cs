@@ -1,27 +1,38 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace BoardGames
+﻿//Contains move data exclusively
+class Move
 {
-	public class Move
+    private int boardIndex;
+    private int row;
+    private int col;
+    private int? val;
+    private PieceType? piece;
+
+
+    public Move(int b, int r, int c, int v)
     {
-        public int PlayerId { get; }
-        public int X { get; }
-        public int Y { get; }
-        public string ValueOrPiece { get; }
-        public int BoardIndex { get; }
+        boardIndex = b;
+        row = r;
+        col = c;
+        val = v;
+    }
 
-        public Move(int playerId, int x, int y, string valueOrPiece = "X", int boardIndex = 0)
-        {
-            PlayerId = playerId;
-            X = x;
-            Y = y;
-            ValueOrPiece = valueOrPiece;
-            BoardIndex = boardIndex;
-        }
-
-        public override string ToString() =>
-            $"Player {PlayerId} → ({X},{Y}) [{ValueOrPiece}] board={BoardIndex}";
+    public Move(int b, int r, int c, PieceType p)
+    {
+        boardIndex = b;
+        row = r;
+        col = c;
+        piece = p;
     }
 }
+
+enum PieceType
+{
+    None = 0,
+    Odds = 1,
+    Evens = 2,
+    X = 3,
+    O = 4,
+    Neutral = 5
+
+}
+
