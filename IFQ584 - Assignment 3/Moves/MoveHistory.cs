@@ -21,7 +21,7 @@ class MoveHistory
 		ClearRedo();
 		currentMoveIndex = doneMoves.Count;
 	}
-    public void Undo()
+    public MoveRecord Undo()
     {
 		bool validUndo = CanUndo();
 
@@ -30,10 +30,13 @@ class MoveHistory
 			MoveRecord undoneMove = doneMoves.Pop();
 			undoneMoves.Push(undoneMove);
 			currentMoveIndex -=1;
+			return undoneMove;
 		}
+
+		return null;
     }
 
-    public void Redo()
+    public MoveRecord Redo()
     {
 		bool validRedo = CanRedo();
 
@@ -42,7 +45,10 @@ class MoveHistory
 			MoveRecord redoneMove = undoneMoves.Pop();
 			doneMoves.Push(redoneMove);
 			currentMoveIndex += 1;
+			return redoneMove;
 		}
+
+		return null;
     }
 
     //When a move is undone and then a different move is played,

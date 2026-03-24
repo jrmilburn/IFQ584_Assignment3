@@ -3,11 +3,15 @@ class MoveRecord
 {
     private Move move;
     private PieceType piece;
-    private int PlayerIndex;
+    private int playerIndex;
     public MoveRecord(Move m, PieceType p, int index)
     {
         move = m;
         piece = p;
-        PlayerIndex = index;
+        playerIndex = index;
     }
+
+    public Move Move => move;
+    public PieceType Piece => piece;
+    public int PlayerIndex => playerIndex;
 }
