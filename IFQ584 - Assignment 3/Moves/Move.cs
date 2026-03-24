@@ -14,6 +14,7 @@ class Move
         row = r;
         col = c;
         val = v;
+        piece = null;
     }
 
     public Move(int b, int r, int c, PieceType p)
@@ -22,7 +23,14 @@ class Move
         row = r;
         col = c;
         piece = p;
+        val = null;
     }
+
+    public int BoardIndex => boardIndex;
+    public int Row => row;
+    public int Col => col;
+    public int? Val => val;
+    public PieceType? Piece => piece;
 }
 
 enum PieceType
