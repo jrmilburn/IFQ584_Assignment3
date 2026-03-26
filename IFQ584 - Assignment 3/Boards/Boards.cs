@@ -29,7 +29,13 @@ class GridBoard : IBoard
 
     public bool IsEmpty(int boardIndex, int row, int col)
     {
-        if()
+        //check in bounds
+        if(!IsInBounds(boardIndex, row, col))
+        {
+            return false;
+        }
+
+        return cells[row, col].IsEmpty();
     }
 
     public Cell GetCell(int boardIndex, int row, int col){}
