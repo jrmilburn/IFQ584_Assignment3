@@ -21,9 +21,16 @@ class GridBoard : IBoard
         }
     }
 
-    public bool IsInBounds(int boardIndex, int row, int col){}
+    public bool IsInBounds(int boardIndex, int row, int col)
+    {
+        //board position greater than 0 and less than board size for row and col
+        return boardIndex == 0 && row >= 0 && row < size && col >= 0 && col < size;
+    }
 
-    public bool IsEmpty(int boardIndex, int row, int col){}
+    public bool IsEmpty(int boardIndex, int row, int col)
+    {
+        if()
+    }
 
     public Cell GetCell(int boardIndex, int row, int col){}
 
@@ -33,7 +40,10 @@ class GridBoard : IBoard
 
     public bool IsFull(int boardIndex){}
 
-    public int GetBoardCount(){}
+    public int GetBoardCount()
+    {
+        return 1;
+    }
 
     public int GetSize(int boardIndex){}
 
