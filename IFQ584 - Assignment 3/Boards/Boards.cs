@@ -38,7 +38,15 @@ class GridBoard : IBoard
         return cells[row, col].IsEmpty();
     }
 
-    public Cell GetCell(int boardIndex, int row, int col){}
+    public Cell GetCell(int boardIndex, int row, int col)
+    {
+        if(!IsInBounds(boardIndex, row, col))
+        {
+            throw new ArgumentException("Cell is out of bounds.");
+        }
+
+        return cells[row, col];
+    }
 
     public bool SetCell(int boardIndex, int row, int col, Cell cell){}
 
