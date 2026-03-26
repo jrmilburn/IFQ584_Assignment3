@@ -1,3 +1,6 @@
+using System;
+using static System.Console;
+
 class GridBoard : IBoard
 {
     private int size;
@@ -34,7 +37,22 @@ class GridBoard : IBoard
 
     public int GetSize(int boardIndex){}
 
-    public void Display(){}
+    public void Display()
+    {
+        WriteLine();
+
+        //Board display
+        for(int row = 0; row < size; row++)
+        {
+            for(int col = 0; col < size; col++)
+            {
+                WriteLine(cells[row, col].GetDisplayText());
+            }
+            WriteLine();
+        }
+        WriteLine();
+
+    }
 
 
 
