@@ -12,6 +12,7 @@ namespace BoardGames
 		public abstract string GameTypeId { get; }
 
 		public abstract List<Move> GetLegalMoves();
+        public abstract Move? ParseMove(string[] args, int playerId);
 		public abstract bool ApplyMove(Move move);
 		public abstract bool UndoMove(Move move);
 		public abstract GameResult CheckResult();
@@ -52,6 +53,13 @@ namespace BoardGames
             if (!Rules.IsValid(move, Board)) return false;
             Board.SetCell(move.X, move.Y, move.ValueOrPiece);
             return true;
+        }
+        public override Move? ParseMove(string[] args, int playerId)
+        {
+            if (args.Length < 3) return null;
+            if (!int.TryParse(args[1], out int x) || !int.TryParse(args[2], out int y)) return null;
+            string piece = playerId == 1 ? "X" : "O";
+            return new Move(playerId, x, y, piece);
         }
 
         public override bool UndoMove(Move move)
@@ -99,6 +107,12 @@ namespace BoardGames
         public override List<Move> GetLegalMoves() =>
             Rules.LegalMoves(Board, CurrentPlayer.ID);
 
+        public override Move? ParseMove(string[] args, int playerId)
+        {
+            if (args.Length < 4) return null;
+            if (!int.TryParse(args[1], out int x) || !int.TryParse(args[2], out int y)) return null;
+            return new Move(playerId, x, y, args[3]);
+        }
         public override bool ApplyMove(Move move)
         {
             if (!Rules.IsValid(move, Board)) return false;
@@ -152,6 +166,13 @@ namespace BoardGames
         public override List<Move> GetLegalMoves() =>
             Rules.LegalMoves(Board, CurrentPlayer.ID);
 
+        public override Move? ParseMove(string[] args, int playerId)
+        {
+            if (args.Length < 4) return null;
+            if (!int.TryParse(args[1], out int x) || !int.TryParse(args[2], out int y)) return null;
+            if (!int.TryParse(args[3], out int boardIndex)) return null;
+            return new Move(playerId, x, y, "X", boardIndex);
+        }
         public override bool ApplyMove(Move move)
         {
             if (!Rules.IsValid(move, Board)) return false;
