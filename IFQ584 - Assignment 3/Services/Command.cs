@@ -1,17 +1,17 @@
 namespace BoardGames
 {
-	public enum CommandType {Move, Undo, Redo, Save, Load, Help, Quit, Invalid}
-	public class Command(CommandType type, string[] input)
+	public enum CommandType {Move, Undo, Redo, Save, Load, Help, Quit, Invalid} // Command type constants available in the program
+	public class Command(CommandType type, string[] input) // Player will type input on their turn which will be converted into a command to allow the user to input their turn in 1 line
 	{
 		public CommandType Type { get; } = type;
 		public string[] Input { get; } = input;
-		public static Command Parse(string playerInput)
+		public static Command Parse(string playerInput) // Will create a command based on the user input or state that the input is invalid
 		{
-			if (string.IsNullOrWhiteSpace(playerInput))
+			CommandType type;
+			if (string.IsNullOrWhiteSpace(playerInput)) // Handles null or blank inputs
 				return new Command(CommandType.Invalid, []);
 			string commandType = playerInput.Split(" ")[0].ToUpper();
-			string[] inputData = playerInput.Split(" ")[1..];
-			CommandType type;
+			string[] inputData = playerInput.Split(" ")[1..]; // Some command types don't require further info (e.g. undo) This will return an empty array in those cases
 			switch (commandType)
 			{
 				case "M" or "MOVE": type = CommandType.Move; break;
@@ -25,7 +25,7 @@ namespace BoardGames
 			}
 			return new Command(type, inputData);
 		}
-		public static void ShowHelp()
+		public static void ShowHelp() // 
 		{
 
 		}
