@@ -1,3 +1,4 @@
+using static System.Console;
 namespace BoardGames
 {
     public class GameController
@@ -31,24 +32,7 @@ namespace BoardGames
                     AnnounceResult(result);
                     break;
                 }
-
-                //  Computer turn 
-                if (_game.CurrentPlayer is ComputerPlayer cp)
-                {
-                    var cpMove = cp.GetMove(_game);
-                    if (_game.ApplyMove(cpMove))
-                    {
-                        _history.DoMove(cpMove);
-                        _game.NextPlayer();
-                    }
-                    continue;
-                }
-
-                //  Human turn 
-                var humanMove = _game.CurrentPlayer.GetMove(_game);
-                // humanMove.ValueOrPiece contains raw input
-                var cmd = _parser.Parse(humanMove.ValueOrPiece);
-
+                Command cmd =_game.CurrentPlayer.GetCommand(_game);
                 if (!HandleCommand(cmd)) break; // quit
             }
         }
