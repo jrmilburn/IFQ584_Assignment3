@@ -8,7 +8,7 @@ namespace BoardGames
 	}
 	public class HumanPlayer(int id, string name) : Player(id, name)
 	{
-		public override Command GetCommand(Game _) // HumanPlayer doesnt require game so no game is passed in to the methed to maintain polymorphism
+		public override Command GetCommand(Game _) // HumanPlayer doesn't require game, however is still passed in to maintain polymorphism
 		{
 			Command input = Command.Parse(Console.ReadLine()); // If user inputs a null value, the command parser will create an invalid command
 			return input;
@@ -16,12 +16,12 @@ namespace BoardGames
 	}
 	public class ComputerPlayer(int id) : Player(id, "CPU")
 	{
-		private readonly Random _rng = new(); // For getting a randome valid move to play
+		private readonly Random _rng = new(); // To allow the CPU to pick a valid random move
 
 		public override Command GetCommand(Game game)
 		{
 			List<Move> availableMoves = game.GetLegalMoves(); // A list of moves available to the computer player
-			Move? comMove = FindWinningMove(game, availableMoves); // comMove is allowed to be null if there is no winning move available. Is replaced by a random move in the next line
+			Move? comMove = FindWinningMove(game, availableMoves); // comMove is allowed to be null if there is no winning move available. Will be replaced by a random move in the next line
 			if (comMove == null)
 				comMove = availableMoves[_rng.Next(availableMoves.Count)]; 
 			Command playedMove = Command.Parse($"move {comMove.X} {comMove.Y} {comMove.ValueOrPiece} {comMove.BoardIndex}"); 
