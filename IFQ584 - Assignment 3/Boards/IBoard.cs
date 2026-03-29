@@ -1,13 +1,10 @@
-interface IBoard
+
+public interface IBoard
 {
-    bool IsInBounds(int boardIndex, int row, int col);
-    bool IsEmpty(int boardIndex, int row, int col);
-    Cell GetCell(int boardIndex, int row, int col);
-    bool SetCell(int boardIndex, int row, int col, Cell cell);
-    void ClearCell(int boardIndex, int row, int col);
-    bool IsFull(int boardIndex);
-    int GetBoardCount();
-    int GetSize(int boardIndex);
-    void Display();
+    bool IsEmpty(int x, int y);
+    string GetCell(int x, int y);
+    void SetCell(int x, int y, string value);
+    IBoard Clone();
     string Serialise();
+    void Render();
 }

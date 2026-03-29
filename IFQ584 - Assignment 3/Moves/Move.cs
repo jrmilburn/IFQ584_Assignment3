@@ -1,39 +1,32 @@
-﻿//Contains move data exclusively
-class Move
+﻿public class Move
 {
+    private int playerId;
+    private int x;
+    private int y;
+    private string valueOrPiece;
     private int boardIndex;
-    private int row;
-    private int col;
-    private int? val;
-    private PieceType? piece;
 
-
-    public Move(int b, int r, int c, int v)
+    public Move(int playerId, int x, int y, string valueOrPiece, int boardIndex = 0)
     {
-        boardIndex = b;
-        row = r;
-        col = c;
-        val = v;
-        piece = null;
+        this.playerId     = playerId;
+        this.x            = x;
+        this.y            = y;
+        this.valueOrPiece = valueOrPiece;
+        this.boardIndex   = boardIndex;
     }
 
-    public Move(int b, int r, int c, PieceType p)
-    {
-        boardIndex = b;
-        row = r;
-        col = c;
-        piece = p;
-        val = null;
-    }
-
+    public int PlayerId => playerId;
+    public int X => x;
+    public int Y => y;
+    public string ValueOrPiece => valueOrPiece;
     public int BoardIndex => boardIndex;
-    public int Row => row;
-    public int Col => col;
-    public int? Val => val;
-    public PieceType? Piece => piece;
+
+    public override string ToString() =>
+        $"Player {playerId}: ({x},{y}) = {valueOrPiece}" +
+        (boardIndex != 0 ? $" [board {boardIndex}]" : "");
 }
 
-enum PieceType
+public enum PieceType
 {
     None = 0,
     Odds = 1,
@@ -41,6 +34,4 @@ enum PieceType
     X = 3,
     O = 4,
     Neutral = 5
-
 }
-

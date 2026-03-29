@@ -1,79 +1,54 @@
-﻿//Contains history of move records
-class MoveHistory
+﻿public class MoveHistory
 {
-    private Stack<MoveRecord> doneMoves;
-    private Stack<MoveRecord> undoneMoves;
-    private int currentMoveIndex;
+    private Stack<Move> doneMoves;
+    private Stack<Move> undoneMoves;
+
     public MoveHistory()
     {
-        doneMoves = new Stack<MoveRecord>();
-		undoneMoves = new Stack<MoveRecord>();
-		currentMoveIndex = 0;
-    }
-    public int CurrentMoveIndex => currentMoveIndex;
-    public void Add(MoveRecord record)
-	{
-		doneMoves.Push(record);
-		//Clear redo options once move is made
-		ClearRedo();
-		currentMoveIndex = doneMoves.Count;
-	}
-    public MoveRecord Undo()
-    {
-		bool validUndo = CanUndo();
-
-		if (validUndo)
-		{
-			MoveRecord undoneMove = doneMoves.Pop();
-			undoneMoves.Push(undoneMove);
-			currentMoveIndex -=1;
-			return undoneMove;
-		}
-
-		return null;
+        doneMoves   = new Stack<Move>();
+        undoneMoves = new Stack<Move>();
     }
 
-    public MoveRecord Redo()
+    public int CurrentMoveIndex => doneMoves.Count;
+
+    // record a new move
+    public void DoMove(Move move)
     {
-		bool validRedo = CanRedo();
-
-		if (validRedo)
-		{
-			MoveRecord redoneMove = undoneMoves.Pop();
-			doneMoves.Push(redoneMove);
-			currentMoveIndex += 1;
-			return redoneMove;
-		}
-
-		return null;
-    }
-
-    //When a move is undone and then a different move is played,
-    // the remainder of the stack should be cleared
-    public void ClearRedo()
-    {
+        doneMoves.Push(move);
         undoneMoves.Clear();
     }
 
-    public bool CanUndo()
+    // undo the most recent move; returns the move so the caller can reverse it
+    public Move? Undo()
     {
-        //If a move has been performed, undo becomes available
-        if(doneMoves.Count > 0)
-        {
-            return true;
-        }
-
-        return false;
+        if (!CanUndo()) return null;
+        Move move = doneMoves.Pop();
+        undoneMoves.Push(move);
+        return move;
     }
 
-    public bool CanRedo()
+    // redo the most recently undone move; returns the move so the caller can re-apply it
+    public Move? Redo()
     {
-		//If a move has been undo then redo becomes available
-		if(undoneMoves.Count > 0)
-		{
-			return true;
-		}
+        if (!CanRedo()) return null;
+        Move move = undoneMoves.Pop();
+        doneMoves.Push(move);
+        return move;
+    }
 
-        return false;
+    public bool CanUndo() => doneMoves.Count > 0;
+    public bool CanRedo() => undoneMoves.Count > 0;
+
+    public IEnumerable<Move> GetDoneMoves() => doneMoves.Reverse();
+
+    public IEnumerable<Move> GetUndoneMoves() => undoneMoves.Reverse();
+
+    // restore history from saved data
+    public void Restore(IEnumerable<Move> done, IEnumerable<Move> undone)
+    {
+        doneMoves.Clear();
+        undoneMoves.Clear();
+        foreach (var move in done) doneMoves.Push(move);
+        foreach (var move in undone) undoneMoves.Push(move);
     }
 }
