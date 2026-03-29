@@ -1,3 +1,4 @@
+using static System.Console;
 namespace BoardGames
 {
     public class GameController
@@ -31,24 +32,7 @@ namespace BoardGames
                     AnnounceResult(result);
                     break;
                 }
-
-                //  Computer turn 
-                if (_game.CurrentPlayer is ComputerPlayer cp)
-                {
-                    var cpMove = cp.GetMove(_game);
-                    if (_game.ApplyMove(cpMove))
-                    {
-                        _history.DoMove(cpMove);
-                        _game.NextPlayer();
-                    }
-                    continue;
-                }
-
-                //  Human turn 
-                var humanMove = _game.CurrentPlayer.GetMove(_game);
-                // humanMove.ValueOrPiece contains raw input
-                var cmd = _parser.Parse(humanMove.ValueOrPiece);
-
+                Command cmd =_game.CurrentPlayer.GetCommand(_game);
                 if (!HandleCommand(cmd)) break; // quit
             }
         }
@@ -99,29 +83,13 @@ namespace BoardGames
 
         private void PerformMove(string[] args)
         {
-            // Parse: MOVE <col> <row> [value/boardIndex]
-            // For Notakto: MOVE <col> <row> <boardIndex>
-            // For NumericalTTT: MOVE <col> <row> <number>
-            // For Gomoku: MOVE <col> <row>
-            if (args.Length < 3 || !int.TryParse(args[1], out int col) || !int.TryParse(args[2], out int row))
+            // Delegate move parsing to the game — controller stays game-agnostic
+            var move = _game.ParseMove(args, _game.CurrentPlayer.ID);
+            if (move == null)
             {
-                Console.WriteLine("  Usage: MOVE <col> <row> [number/boardIndex]");
+                Console.WriteLine("  Invalid input. Type HELP for move format.");
                 return;
             }
-
-            string valueOrPiece = _game.CurrentPlayer.ID == 1 ? "X" : "O";
-            int boardIndex = 0;
-
-            if (args.Length >= 4)
-            {
-                // NumericalTTT expects a number; Notakto expects a board index
-                if (_game.GameTypeId == "NumericalTTT")
-                    valueOrPiece = args[3];
-                else if (_game.GameTypeId == "Notakto" && int.TryParse(args[3], out int bi))
-                    boardIndex = bi;
-            }
-
-            var move = new Move(_game.CurrentPlayer.ID, col, row, valueOrPiece, boardIndex);
 
             if (_game.ApplyMove(move))
             {

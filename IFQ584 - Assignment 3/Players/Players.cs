@@ -1,64 +1,44 @@
 namespace BoardGames
 {
-	public abstract class Player(int id, string name)
+	public abstract class Player(int id, string name) // Responsible for handling human and computer command inputs
 	{
-        public int ID { get; } = id;
-        public string Name { get; } = name;
-		public abstract Move GetMove(Game game);
+        public int ID { get; } = id; // Player ID for handling move history
+        public string Name { get; } = name; // Player name for UI turn signaling
+		public abstract Command GetCommand(Game game);
 	}
 	public class HumanPlayer(int id, string name) : Player(id, name)
 	{
-		public override Move GetMove(Game game)
+		public override Command GetCommand(Game _) // HumanPlayer doesn't require game, however is still passed in to maintain polymorphism
 		{
-			// collect a raw line
-			//  delegate validation back through game.GetLegalMoves / IRules.
-			while (true)
-			{
-				Console.Write($"  {Name} > ");
-				var input = Console.ReadLine()?.Trim() ?? "";
-
-
-				// embed the raw input in a special "human input" move using
-				// x=y=-1 as a marker; GameController handles it.
-				return new Move(ID, -1, -1, input);
-			}
-		}
+			Command input = Command.Parse(Console.ReadLine()); // If user inputs a null value, the command parser will create an invalid command
+			return input;
+		}	
 	}
-	//  ComputerPlayer 
-	public class ComputerPlayer(int id, Random? rng = null) : Player(id, "CPU")
+	public class ComputerPlayer(int id) : Player(id, "CPU")
 	{
-		public int Id { get; } = id;
-		private readonly Random _rng = rng ?? new Random();
+		private readonly Random _rng = new(); // To allow the CPU to pick a valid random move
 
-		public override Move GetMove(Game game)
+		public override Command GetCommand(Game game)
 		{
-			var legal = game.GetLegalMoves();
-			if (legal.Count == 0) throw new InvalidOperationException("No legal moves.");
-
-			// Try immediate win
-			var winning = FindImmediateWin(game, legal);
-			if (winning != null)
-			{
-				Console.WriteLine("  [CPU] Found winning move!");
-				return winning;
-			}
-
-			// Random fallback
-			var chosen = legal[_rng.Next(legal.Count)];
-			Console.WriteLine($"  [CPU] Plays ({chosen.X},{chosen.Y})");
-			return chosen;
-		}
-
-		private Move? FindImmediateWin(Game game, List<Move> candidates)
+			List<Move> availableMoves = game.GetLegalMoves(); // A list of moves available to the computer player
+			Move? comMove = FindWinningMove(game, availableMoves); // comMove is allowed to be null if there is no winning move available. Will be replaced by a random move in the next line
+			if (comMove == null)
+				comMove = availableMoves[_rng.Next(availableMoves.Count)]; 
+			Command playedMove = Command.Parse($"move {comMove.X} {comMove.Y} {comMove.ValueOrPiece} {comMove.BoardIndex}"); 
+			return playedMove;
+		}  
+		private static Move? FindWinningMove(Game game, List<Move> availableMoves) // Will provide null value if no winning move available game. This is handled in GetCommand
 		{
-			foreach (var m in candidates)
+			foreach(Move move in availableMoves)
 			{
-				// Use game.ApplyMove / CheckResult / UndoMove to test
-				game.ApplyMove(m);
-				var result = game.CheckResult();
-				game.UndoMove(m);
-				if (result == GameResult.Win || result == GameResult.Loss)
-					return m;
+				game.ApplyMove(move);
+				if (game.CheckResult() == GameResult.Win)
+				{
+					game.UndoMove(move);
+					return move;
+				}
+				else
+					game.UndoMove(move);
 			}
 			return null;
 		}
