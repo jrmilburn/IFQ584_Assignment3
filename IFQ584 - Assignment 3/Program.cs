@@ -1,7 +1,4 @@
-﻿using BoardGames.Controllers;
-using BoardGames.Games;
-
-namespace BoardGames
+﻿namespace BoardGames
 {
     class Program
     {

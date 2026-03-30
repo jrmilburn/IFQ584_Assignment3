@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using static System.Console;
 
 // GridBoard – general n×n string grid (Gomoku, Notakto sub-boards)
@@ -31,9 +32,57 @@ public class GridBoard : IBoard
     public string GetCell(int x, int y)  => cells[y, x];
     public void   SetCell(int x, int y, string value) => cells[y, x] = value;
     public IBoard Clone() => new GridBoard(this);
-
-    // Format: "size|r0c0,r0c1,...;r1c0,...|Dead"
-    public string Serialise()
+    public string[] GetRow(int r, int index = 0)
+    {
+		string[] row = new string[Size];
+		for (int c = 0; c < Size; c++)
+			row[c] = cells[r, c];
+		return row;
+	}
+	public string[] GetColumn(int c, int index = 0) // returns an array of the move values for the column at the specified column index
+	{
+		string[] column = new string[Size];
+		for (int r = 0; r < Size; r++)
+			column[r] = cells[r, c];
+		return column;
+	}
+	public string[] GetDiagonal(bool leftToRight, int index = 0)
+    {
+		string[] diagonal = new string[Size];
+		if (leftToRight)
+			for (int rc = 0; rc < Size; rc++)
+				diagonal[rc] = cells[rc, rc];
+		else
+			for (int rc = 0; rc < Size; rc++)
+				diagonal[rc] = cells[rc, Size - 1 - rc];
+		return diagonal;
+	}
+	public (int, int)[] GetEmptyCells(int index = 0)
+	{
+		List<(int, int)> emptyCells = [];
+		for (int r = 0; r < 3; r++)
+			for (int c = 0; c < 3; c++)
+				if (IsEmpty(r, c))
+					emptyCells.Add((r, c));
+		return emptyCells.ToArray();
+	}
+	public bool Contains(string value)
+	{
+		foreach (string cell in cells)
+			if (value == cell)
+				return true;
+		return false;
+	}
+	public IBoard GetBoardAtIndex(int i)
+	{
+		return this;
+	}
+	public bool IsDead()
+	{
+		return Dead;
+	}
+	// Format: "size|r0c0,r0c1,...;r1c0,...|Dead"
+	public string Serialise()
     {
         var rows = new List<string>();
         for (int row = 0; row < Size; row++)
@@ -141,7 +190,39 @@ public class MultiBoard : IBoard
     public bool   IsEmpty(int x, int y) => Boards[routeIndex].IsEmpty(x, y);
     public string GetCell(int x, int y)  => Boards[routeIndex].GetCell(x, y);
     public void   SetCell(int x, int y, string value) => Boards[routeIndex].SetCell(x, y, value);
-    public IBoard Clone() => new MultiBoard(this);
+	public string[] GetRow(int row, int index)
+    {
+        return Boards[index].GetRow(row);
+    }
+	public string[] GetColumn(int col, int index)
+	{
+		return Boards[index].GetColumn(col);
+	}
+	public string[] GetDiagonal(bool leftToRight, int index)
+    {
+		return Boards[index].GetDiagonal(leftToRight);
+	}
+	public (int, int)[] GetEmptyCells(int index)
+	{
+        return Boards[index].GetEmptyCells();
+	}
+    public bool IsFull()
+    {
+        return false;
+    }
+    public bool Contains(string ValueOrPiece)
+    {
+        return false;
+    }
+	public IBoard GetBoardAtIndex(int i)
+	{
+		return Boards[i];
+	}
+	public bool IsDead()
+	{
+        return false;
+	}
+	public IBoard Clone() => new MultiBoard(this);
 
     // Sub-boards separated by '~'
     public string Serialise() => string.Join("~", Boards.Select(b => b.Serialise()));
@@ -205,17 +286,64 @@ public class NumericBoard : IBoard
                     used.Add(v);
         return used;
     }
-
-    public bool IsFull()
+	public string[] GetRow(int r, int index = 0)
+	{
+		string[] row = new string[Size];
+		for (int c = 0; c < Size; c++)
+			row[c] = cells[r, c];
+		return row;
+	}
+	public (int, int)[] GetEmptyCells(int index = 0)
+	{
+		List<(int, int)> emptyCells = [];
+		for (int r = 0; r < 3; r++)
+			for (int c = 0; c < 3; c++)
+				if (IsEmpty(r, c))
+					emptyCells.Add((r, c));
+		return emptyCells.ToArray();
+	}
+	public string[] GetColumn(int c, int index = 0) // returns an array of the move values for the column at the specified column index
+	{
+		string[] column = new string[Size];
+		for (int r = 0; r < Size; r++)
+			column[r] = cells[r, c];
+		return column;
+	}
+	public string[] GetDiagonal(bool leftToRight, int index = 0)
+	{
+		string[] diagonal = new string[Size];
+		if (leftToRight)
+			for (int rc = 0; rc < Size; rc++)
+				diagonal[rc] = cells[rc, rc];
+		else
+			for (int rc = 0; rc < Size; rc++)
+				diagonal[rc] = cells[rc, Size - 1 - rc];
+		return diagonal;
+	}
+	public bool IsFull()
     {
         for (int row = 0; row < Size; row++)
             for (int col = 0; col < Size; col++)
                 if (cells[row, col] == ".") return false;
         return true;
     }
-
-    // Format: "size|r0c0,r0c1,...;r1c0,..."
-    public string Serialise()
+	public bool Contains(string value)
+	{
+		foreach (string cell in cells)
+			if (value == cell)
+				return true;
+		return false;
+	}
+	public IBoard GetBoardAtIndex(int i)
+	{
+		return this;
+	}
+	public bool IsDead()
+	{
+		return false;
+	}
+	// Format: "size|r0c0,r0c1,...;r1c0,..."
+	public string Serialise()
     {
         var rows = new List<string>();
         for (int row = 0; row < Size; row++)

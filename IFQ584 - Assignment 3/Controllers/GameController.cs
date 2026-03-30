@@ -5,21 +5,19 @@ namespace BoardGames
     {
         private Game            _game;
         private MoveHistory     _history;
-        private CommandParser   _parser;
         private SaveLoadService _saveLoad;
 
         public GameController(Game game)
         {
             _game     = game;
             _history  = new MoveHistory();
-            _parser   = new CommandParser();
             _saveLoad = new SaveLoadService();
         }
 
         public void Run()
         {
             Console.WriteLine($"\n  === {_game.GameTypeId} ({_game.Mode}) ===");
-            _parser.ShowHelp();
+            Command.ShowHelp();
 
             while (true)
             {
@@ -45,7 +43,7 @@ namespace BoardGames
                     return false;
 
                 case CommandType.Help:
-                    _parser.ShowHelp();
+                    Command.ShowHelp();
                     return true;
 
                 case CommandType.Undo:
@@ -57,12 +55,12 @@ namespace BoardGames
                     return true;
 
                 case CommandType.Save:
-                    string savePath = cmd.Args.Length > 1 ? cmd.Args[1] : "save.json";
+                    string savePath = cmd.Input.Length > 1 ? cmd.Input[1] : "save.json";
                     _saveLoad.Save(savePath, _game.Serialise(), _history);
                     return true;
 
                 case CommandType.Load:
-                    string loadPath = cmd.Args.Length > 1 ? cmd.Args[1] : "save.json";
+                    string loadPath = cmd.Input.Length > 1 ? cmd.Input[1] : "save.json";
                     var loaded = _saveLoad.Load(loadPath);
                     if (loaded.HasValue)
                     {
@@ -72,7 +70,7 @@ namespace BoardGames
                     return true;
 
                 case CommandType.Move:
-                    PerformMove(cmd.Args);
+					PerformMove(cmd.Input);
                     return true;
 
                 default:
@@ -83,8 +81,8 @@ namespace BoardGames
 
         private void PerformMove(string[] args)
         {
-            // Delegate move parsing to the game — controller stays game-agnostic
-            var move = _game.ParseMove(args, _game.CurrentPlayer.ID);
+			// Delegate move parsing to the game — controller stays game-agnostic
+			var move = _game.ParseMove(args, _game.CurrentPlayer.ID);
             if (move == null)
             {
                 Console.WriteLine("  Invalid input. Type HELP for move format.");

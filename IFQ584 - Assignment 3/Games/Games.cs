@@ -10,7 +10,6 @@ namespace BoardGames
 		public Player CurrentPlayer => Players[CurrentPlayerIndex];
 		public string Mode { get; protected set; } = "";
 		public abstract string GameTypeId { get; }
-
 		public abstract List<Move> GetLegalMoves();
         public abstract Move? ParseMove(string[] args, int playerId);
 		public abstract bool ApplyMove(Move move);
@@ -46,11 +45,11 @@ namespace BoardGames
         }
 
         public override List<Move> GetLegalMoves() =>
-            Rules.LegalMoves(Board, CurrentPlayer.ID);
+            Rules.GetAvailableMoves(Board, CurrentPlayer.ID);
 
         public override bool ApplyMove(Move move)
         {
-            if (!Rules.IsValid(move, Board)) return false;
+            if (!Rules.IsValid(move, Board, CurrentPlayer.ID)) return false;
             Board.SetCell(move.X, move.Y, move.ValueOrPiece);
             return true;
         }
@@ -98,24 +97,24 @@ namespace BoardGames
         {
             Mode  = mode.ToString();
             Board = new NumericBoard();
-            Rules = new NumericalTTTRules();
+            Rules = new NumericalTTTRules(3);
             Players = mode == GameMode.HumanVsHuman
                 ? new Player[] { new HumanPlayer(1, "p1"), new HumanPlayer(2, "p2") }
                 : new Player[] { new HumanPlayer(1, "p1"), new ComputerPlayer(2) };
         }
 
         public override List<Move> GetLegalMoves() =>
-            Rules.LegalMoves(Board, CurrentPlayer.ID);
+            Rules.GetAvailableMoves(Board, CurrentPlayer.ID);
 
         public override Move? ParseMove(string[] args, int playerId)
         {
-            if (args.Length < 4) return null;
-            if (!int.TryParse(args[1], out int x) || !int.TryParse(args[2], out int y)) return null;
-            return new Move(playerId, x, y, args[3]);
+            if (args.Length < 3) return null;
+            if (!int.TryParse(args[0], out int x) || !int.TryParse(args[1], out int y)) return null;
+            return new Move(playerId, x, y, args[2]);
         }
         public override bool ApplyMove(Move move)
         {
-            if (!Rules.IsValid(move, Board)) return false;
+            if (!Rules.IsValid(move, Board, CurrentPlayer.ID)) return false;
             Board.SetCell(move.X, move.Y, move.ValueOrPiece);
             return true;
         }
@@ -164,7 +163,7 @@ namespace BoardGames
         }
 
         public override List<Move> GetLegalMoves() =>
-            Rules.LegalMoves(Board, CurrentPlayer.ID);
+            Rules.GetAvailableMoves(Board, CurrentPlayer.ID);
 
         public override Move? ParseMove(string[] args, int playerId)
         {
@@ -175,7 +174,7 @@ namespace BoardGames
         }
         public override bool ApplyMove(Move move)
         {
-            if (!Rules.IsValid(move, Board)) return false;
+            if (!Rules.IsValid(move, Board, CurrentPlayer.ID)) return false;
             MBoard.SetRouteIndex(move.BoardIndex);
             Board.SetCell(move.X, move.Y, move.ValueOrPiece);
             Rules.Evaluate(Board); // updates dead boards
@@ -190,7 +189,7 @@ namespace BoardGames
             MBoard.Boards[move.BoardIndex].Dead = false;
             // Re-evaluate all boards for dead status
             foreach (var gb in MBoard.Boards)
-                if (!gb.Dead && gb.HasNInARow("X", 3)) gb.Dead = true;
+                if (!gb.Dead /*&& gb.HasNInARow("X", 3)*/) gb.Dead = true;
             return true;
         }
 
