@@ -40,7 +40,7 @@ namespace BoardGames
 					return move;
 				if (result == GameResult.Loss)
 					losingMoveFound = true;
-				else if (safeMove == null && losingMoveFound == false)
+				else if (safeMove == null)
 					safeMove = move;
 			}
 			if (losingMoveFound)
