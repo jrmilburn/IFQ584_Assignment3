@@ -1,7 +1,8 @@
 
 public interface IBoard
 {
-    bool IsEmpty(int x, int y);
+	bool Dead { get; set; }
+	bool IsEmpty(int x, int y);
     string GetCell(int x, int y);
     void SetCell(int x, int y, string value);
     (int, int)[] GetEmptyCells(int index = 0);

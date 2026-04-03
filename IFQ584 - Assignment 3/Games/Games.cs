@@ -55,11 +55,11 @@ namespace BoardGames
         }
         public override Move? ParseMove(string[] args, int playerId)
         {
-            if (args.Length < 3) return null;
-            if (!int.TryParse(args[1], out int x) || !int.TryParse(args[2], out int y)) return null;
-            string piece = playerId == 1 ? "X" : "O";
-            return new Move(playerId, x, y, piece);
-        }
+			if (args.Length < 2) return null;
+			if (!int.TryParse(args[0], out int x) || !int.TryParse(args[1], out int y)) return null;
+			string piece = playerId == 1 ? "X" : "O";
+			return new Move(playerId, x, y, piece);
+		}
 
         public override bool UndoMove(Move move)
         {
@@ -91,12 +91,12 @@ namespace BoardGames
     public class NumericalTTTGame : Game
     {
         public override string GameTypeId => "NumericalTTT";
-        private NumericBoard NBoard => (NumericBoard)Board;
+        private GridBoard NBoard => (GridBoard)Board;
 
         public NumericalTTTGame(GameMode mode)
         {
             Mode  = mode.ToString();
-            Board = new NumericBoard();
+            Board = new GridBoard(3);
             Rules = new NumericalTTTRules(3);
             Players = mode == GameMode.HumanVsHuman
                 ? new Player[] { new HumanPlayer(1, "p1"), new HumanPlayer(2, "p2") }
@@ -108,10 +108,10 @@ namespace BoardGames
 
         public override Move? ParseMove(string[] args, int playerId)
         {
-            if (args.Length < 3) return null;
-            if (!int.TryParse(args[0], out int x) || !int.TryParse(args[1], out int y)) return null;
-            return new Move(playerId, x, y, args[2]);
-        }
+			if (args.Length < 3) return null;
+			if (!int.TryParse(args[0], out int x) || !int.TryParse(args[1], out int y)) return null;
+			return new Move(playerId, x, y, args[2]);
+		}
         public override bool ApplyMove(Move move)
         {
             if (!Rules.IsValid(move, Board, CurrentPlayer.ID)) return false;
@@ -138,7 +138,7 @@ namespace BoardGames
 
         public override void RestoreFrom(GameState gs)
         {
-            Board              = NumericBoard.Deserialise(gs.BoardData);
+            Board              = GridBoard.Deserialise(gs.BoardData);
             CurrentPlayerIndex = gs.CurrentPlayer;
         }
     }
@@ -167,12 +167,13 @@ namespace BoardGames
 
         public override Move? ParseMove(string[] args, int playerId)
         {
-            if (args.Length < 4) return null;
-            if (!int.TryParse(args[1], out int x) || !int.TryParse(args[2], out int y)) return null;
-            if (!int.TryParse(args[3], out int boardIndex)) return null;
-            return new Move(playerId, x, y, "X", boardIndex);
-        }
-        public override bool ApplyMove(Move move)
+			if (args.Length < 3) return null;
+			if (!int.TryParse(args[0], out int x)) return null;
+			if (!int.TryParse(args[1], out int y)) return null;
+			if (!int.TryParse(args[^1], out int boardIndex)) return null; // computer and human outputs will be different, this ensures the last value in a move command is read
+			return new Move(playerId, x, y, "X", boardIndex);
+		}
+		public override bool ApplyMove(Move move)
         {
             if (!Rules.IsValid(move, Board, CurrentPlayer.ID)) return false;
             MBoard.SetRouteIndex(move.BoardIndex);
@@ -189,8 +190,8 @@ namespace BoardGames
             MBoard.Boards[move.BoardIndex].Dead = false;
             // Re-evaluate all boards for dead status
             foreach (var gb in MBoard.Boards)
-                if (!gb.Dead /*&& gb.HasNInARow("X", 3)*/) gb.Dead = true;
-            return true;
+				if (!gb.Dead && !NRules.HasWinningLine(gb)) gb.Dead = true;
+			return true;
         }
 
         public override GameResult CheckResult() => Rules.Evaluate(Board);
