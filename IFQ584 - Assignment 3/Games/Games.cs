@@ -93,11 +93,11 @@ namespace BoardGames
         public override string GameTypeId => "NumericalTTT";
         private GridBoard NBoard => (GridBoard)Board;
 
-        public NumericalTTTGame(GameMode mode)
+        public NumericalTTTGame(GameMode mode, int boardSize = 3)
         {
-            Mode  = mode.ToString();
-            Board = new GridBoard(3);
-            Rules = new NumericalTTTRules(3);
+            Mode = mode.ToString();
+            Board = new GridBoard(boardSize);
+            Rules = new NumericalTTTRules(boardSize);
             Players = mode == GameMode.HumanVsHuman
                 ? new Player[] { new HumanPlayer(1, "p1"), new HumanPlayer(2, "p2") }
                 : new Player[] { new HumanPlayer(1, "p1"), new ComputerPlayer(2) };
@@ -217,12 +217,12 @@ namespace BoardGames
     // ═══════════════════════════════════════════════════════════════════════════
     public static class GameFactory
     {
-        public static Game Create(string typeId, GameMode mode) => typeId switch
+        public static Game Create(string typeId, GameMode mode, int boardSize = 3) => typeId switch
         {
-            "Gomoku"       => new GomokuGame(mode),
-            "NumericalTTT" => new NumericalTTTGame(mode),
-            "Notakto"      => new NotaktoGame(mode),
-            _              => throw new ArgumentException($"Unknown game type: {typeId}")
+            "Gomoku" => new GomokuGame(mode),
+            "NumericalTTT" => new NumericalTTTGame(mode, boardSize),
+            "Notakto" => new NotaktoGame(mode),
+            _ => throw new ArgumentException($"Unknown game type: {typeId}")
         };
     }
 }

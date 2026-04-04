@@ -16,7 +16,8 @@
 
                 var mode = SelectMode();
 
-                var game = GameFactory.Create(gameType, mode);
+                int boardSize = gameType == "NumericalTTT" ? SelectBoardSize() : 3;
+                var game = GameFactory.Create(gameType, mode, boardSize);
                 var controller = new GameController(game);
                 controller.Run();
 
@@ -43,6 +44,15 @@
                 "3" => "Notakto",
                 _ => null
             };
+        }
+        static int SelectBoardSize()
+        {
+            Console.WriteLine("\n  Enter board size (e.g. 3 for 3x3, 4 for 4x4):");
+            Console.Write("  > ");
+            if (int.TryParse(Console.ReadLine()?.Trim(), out int size) && size >= 3)
+                return size;
+            Console.WriteLine("  Invalid input, defaulting to 3.");
+            return 3;
         }
 
         static GameMode SelectMode()
