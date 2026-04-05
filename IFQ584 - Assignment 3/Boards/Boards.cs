@@ -214,7 +214,7 @@ public class MultiBoard : IBoard
 		foreach(IBoard board in Boards)
 			if (!board.IsDead())
 				return false;
-        return false;
+        return true;
 	}
 
 	public IBoard Clone() => new MultiBoard(this);
