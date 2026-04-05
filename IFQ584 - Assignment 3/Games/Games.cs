@@ -1,27 +1,44 @@
 namespace BoardGames
 {
-	public abstract class Game
-	{
-		protected IBoard Board { get; set; } = null!;
-		protected IRules Rules { get; set; } = null!;
-		protected Player[] Players { get; set; } = null!;
-
-		public int CurrentPlayerIndex { get; set; }
-		public Player CurrentPlayer => Players[CurrentPlayerIndex];
-		public string Mode { get; protected set; } = "";
-		public abstract string GameTypeId { get; }
-		public abstract List<Move> GetLegalMoves();
+    public abstract class Game
+    {
+        protected IBoard Board { get; set; } = null!;
+        protected IRules Rules { get; set; } = null!;
+        protected Player[] Players { get; set; } = null!;
+        public int CurrentPlayerIndex { get; set; }
+        public Player CurrentPlayer => Players[CurrentPlayerIndex];
+        public string Mode { get; protected set; } = "";
+        public abstract string GameTypeId { get; }
+        public Move[] GetLegalMoves() => Rules.GetAvailableMoves(Board, CurrentPlayer.ID);
         public abstract Move? ParseMove(string[] args, int playerId);
-		public abstract bool ApplyMove(Move move);
-		public abstract bool UndoMove(Move move);
-		public abstract GameResult CheckResult();
-		public abstract void RenderBoard();
-		public abstract GameState Serialise();
-		public abstract void RestoreFrom(GameState gs);
-
-		public void NextPlayer() =>
-			CurrentPlayerIndex = (CurrentPlayerIndex + 1) % Players.Length;
-	}
+        public virtual bool ApplyMove(Move move)
+        {
+            if (!Rules.IsValid(move, Board, CurrentPlayer.ID)) return false;
+            Board.SetCell(move.X, move.Y, move.ValueOrPiece);
+            return true;
+        }
+        public virtual bool UndoMove(Move move)
+        {
+            Board.SetCell(move.X, move.Y, ".");
+            return true;
+        }
+        public GameResult CheckResult() => Rules.Evaluate(Board);
+        public void RenderBoard() => Board.Render();
+        public GameState Serialise() => new()
+        {
+            GameTypeId = GameTypeId,
+            Mode = Mode,
+            BoardData = Board.Serialise(),
+            CurrentPlayer = CurrentPlayerIndex
+        };
+        public virtual void RestoreFrom(GameState gs)
+        {
+            Board = GridBoard.Deserialise(gs.BoardData);
+            CurrentPlayerIndex = gs.CurrentPlayer;
+        }
+        public void NextPlayer() =>
+            CurrentPlayerIndex = (CurrentPlayerIndex + 1) % Players.Length;
+    }
     // GameMode 
     public enum GameMode { HumanVsHuman, HumanVsComputer }
 
@@ -31,57 +48,22 @@ namespace BoardGames
     public class GomokuGame : Game
     {
         public override string GameTypeId => "Gomoku";
-        private GridBoard GBoard => (GridBoard)Board;
-        private GomokuRules GRules => (GomokuRules)Rules;
-
         public GomokuGame(GameMode mode, int boardSize = 15)
         {
-            Mode  = mode.ToString();
+            Mode = mode.ToString();
             Board = new GridBoard(boardSize);
-            Rules = new GomokuRules(5);
+            Rules = new GomokuRules();
             Players = mode == GameMode.HumanVsHuman
                 ? new Player[] { new HumanPlayer(1, "p1"), new HumanPlayer(2, "p2") }
                 : new Player[] { new HumanPlayer(1, "p1"), new ComputerPlayer(2) };
         }
 
-        public override List<Move> GetLegalMoves() =>
-            Rules.GetAvailableMoves(Board, CurrentPlayer.ID);
-
-        public override bool ApplyMove(Move move)
-        {
-            if (!Rules.IsValid(move, Board, CurrentPlayer.ID)) return false;
-            Board.SetCell(move.X, move.Y, move.ValueOrPiece);
-            return true;
-        }
         public override Move? ParseMove(string[] args, int playerId)
         {
-			if (args.Length < 2) return null;
-			if (!int.TryParse(args[0], out int x) || !int.TryParse(args[1], out int y)) return null;
-			string piece = playerId == 1 ? "X" : "O";
-			return new Move(playerId, x, y, piece);
-		}
-
-        public override bool UndoMove(Move move)
-        {
-            Board.SetCell(move.X, move.Y, ".");
-            return true;
-        }
-
-        public override GameResult CheckResult() => Rules.Evaluate(Board);
-        public override void RenderBoard() => Board.Render();
-
-        public override GameState Serialise() => new()
-        {
-            GameTypeId    = GameTypeId,
-            Mode          = Mode,
-            BoardData     = GBoard.Serialise(),
-            CurrentPlayer = CurrentPlayerIndex
-        };
-
-        public override void RestoreFrom(GameState gs)
-        {
-            Board               = GridBoard.Deserialise(gs.BoardData);
-            CurrentPlayerIndex  = gs.CurrentPlayer;
+            if (args.Length < 2) return null;
+            if (!int.TryParse(args[0], out int x) || !int.TryParse(args[1], out int y)) return null;
+            string piece = playerId == 1 ? "X" : "O";
+            return new Move(playerId, x, y, piece);
         }
     }
 
@@ -91,8 +73,6 @@ namespace BoardGames
     public class NumericalTTTGame : Game
     {
         public override string GameTypeId => "NumericalTTT";
-        private GridBoard NBoard => (GridBoard)Board;
-
         public NumericalTTTGame(GameMode mode, int boardSize = 3)
         {
             Mode = mode.ToString();
@@ -103,43 +83,11 @@ namespace BoardGames
                 : new Player[] { new HumanPlayer(1, "p1"), new ComputerPlayer(2) };
         }
 
-        public override List<Move> GetLegalMoves() =>
-            Rules.GetAvailableMoves(Board, CurrentPlayer.ID);
-
         public override Move? ParseMove(string[] args, int playerId)
         {
-			if (args.Length < 3) return null;
-			if (!int.TryParse(args[0], out int x) || !int.TryParse(args[1], out int y)) return null;
-			return new Move(playerId, x, y, args[2]);
-		}
-        public override bool ApplyMove(Move move)
-        {
-            if (!Rules.IsValid(move, Board, CurrentPlayer.ID)) return false;
-            Board.SetCell(move.X, move.Y, move.ValueOrPiece);
-            return true;
-        }
-
-        public override bool UndoMove(Move move)
-        {
-            Board.SetCell(move.X, move.Y, ".");
-            return true;
-        }
-
-        public override GameResult CheckResult() => Rules.Evaluate(Board);
-        public override void RenderBoard() => Board.Render();
-
-        public override GameState Serialise() => new()
-        {
-            GameTypeId    = GameTypeId,
-            Mode          = Mode,
-            BoardData     = NBoard.Serialise(),
-            CurrentPlayer = CurrentPlayerIndex
-        };
-
-        public override void RestoreFrom(GameState gs)
-        {
-            Board              = GridBoard.Deserialise(gs.BoardData);
-            CurrentPlayerIndex = gs.CurrentPlayer;
+            if (args.Length < 3) return null;
+            if (!int.TryParse(args[0], out int x) || !int.TryParse(args[1], out int y)) return null;
+            return new Move(playerId, x, y, args[2]);
         }
     }
 
@@ -150,11 +98,9 @@ namespace BoardGames
     {
         public override string GameTypeId => "Notakto";
         private MultiBoard MBoard => (MultiBoard)Board;
-        private NotaktoRules NRules => (NotaktoRules)Rules;
-
         public NotaktoGame(GameMode mode)
         {
-            Mode  = mode.ToString();
+            Mode = mode.ToString();
             Board = new MultiBoard();
             Rules = new NotaktoRules();
             Players = mode == GameMode.HumanVsHuman
@@ -162,18 +108,15 @@ namespace BoardGames
                 : new Player[] { new HumanPlayer(1, "p1"), new ComputerPlayer(2) };
         }
 
-        public override List<Move> GetLegalMoves() =>
-            Rules.GetAvailableMoves(Board, CurrentPlayer.ID);
-
         public override Move? ParseMove(string[] args, int playerId)
         {
-			if (args.Length < 3) return null;
-			if (!int.TryParse(args[0], out int x)) return null;
-			if (!int.TryParse(args[1], out int y)) return null;
-			if (!int.TryParse(args[^1], out int boardIndex)) return null; // computer and human outputs will be different, this ensures the last value in a move command is read
-			return new Move(playerId, x, y, "X", boardIndex);
-		}
-		public override bool ApplyMove(Move move)
+            if (args.Length < 3) return null;
+            if (!int.TryParse(args[0], out int x)) return null;
+            if (!int.TryParse(args[1], out int y)) return null;
+            if (!int.TryParse(args[^1], out int boardIndex)) return null; // computer and human outputs will be different, this ensures the last value in a move command is read
+            return new Move(playerId, x, y, "X", boardIndex);
+        }
+        public override bool ApplyMove(Move move)
         {
             if (!Rules.IsValid(move, Board, CurrentPlayer.ID)) return false;
             MBoard.SetRouteIndex(move.BoardIndex);
@@ -190,24 +133,13 @@ namespace BoardGames
             MBoard.Boards[move.BoardIndex].Dead = false;
             // Re-evaluate all boards for dead status
             foreach (var gb in MBoard.Boards)
-				if (!gb.Dead && !NRules.HasWinningLine(gb)) gb.Dead = true;
-			return true;
+                if (!gb.Dead && !Rules.HasWinningLine(gb)) gb.Dead = true;
+            return true;
         }
-
-        public override GameResult CheckResult() => Rules.Evaluate(Board);
-        public override void RenderBoard() => Board.Render();
-
-        public override GameState Serialise() => new()
-        {
-            GameTypeId    = GameTypeId,
-            Mode          = Mode,
-            BoardData     = MBoard.Serialise(),
-            CurrentPlayer = CurrentPlayerIndex
-        };
 
         public override void RestoreFrom(GameState gs)
         {
-            Board              = MultiBoard.Deserialise(gs.BoardData);
+            Board = MultiBoard.Deserialise(gs.BoardData);
             CurrentPlayerIndex = gs.CurrentPlayer;
         }
     }

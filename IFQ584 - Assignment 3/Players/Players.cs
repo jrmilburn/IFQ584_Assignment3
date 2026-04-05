@@ -20,14 +20,14 @@ namespace BoardGames
 
 		public override Command GetCommand(Game game)
 		{
-			List<Move> availableMoves = game.GetLegalMoves(); // A list of moves available to the computer player
+			Move[] availableMoves = game.GetLegalMoves(); // A list of moves available to the computer player
 			Move? comMove = FindWinningMove(game, availableMoves); // comMove is allowed to be null if there is no winning move available. Will be replaced by a random move in the next line
 			if (comMove == null)
-				comMove = availableMoves[rng.Next(availableMoves.Count)];
+				comMove = availableMoves[rng.Next(availableMoves.Length)];
 			Command playedMove = Command.Parse($"move {comMove.X} {comMove.Y} {comMove.ValueOrPiece} {comMove.BoardIndex}");
 			return playedMove;
 		}
-		private static Move? FindWinningMove(Game game, List<Move> availableMoves) // Will provide null value if no winning move available game. This is handled in GetCommand
+		private static Move? FindWinningMove(Game game, Move[] availableMoves) // Will provide null value if no winning move available game. This is handled in GetCommand
 		{
 			Move safeMove = null;
 			bool losingMoveFound = false;

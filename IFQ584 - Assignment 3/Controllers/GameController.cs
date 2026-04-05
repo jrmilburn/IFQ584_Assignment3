@@ -110,7 +110,7 @@ namespace BoardGames
             if (move == null) { Console.WriteLine("  Nothing to undo."); return; }
             _game.UndoMove(move);
             // Step back one player
-            int prev = (_game.CurrentPlayerIndex + _game.GetLegalMoves().Count > 0 ? 1 : 0);
+            int prev = (_game.CurrentPlayerIndex + _game.GetLegalMoves().Length > 0 ? 1 : 0);
             // Simple: toggle between 0 and 1
             _game.CurrentPlayerIndex = 1 - _game.CurrentPlayerIndex;
             Console.WriteLine($"  Undo: {move}");

@@ -13,6 +13,7 @@ public interface IBoard
     string[] GetDiagonal(bool leftToRight, int index = 0);
     bool IsFull();
     bool Contains(string ValueOrPiece);
+    bool InBounds(int x, int y);
     IBoard Clone();
     string Serialise();
     void Render();

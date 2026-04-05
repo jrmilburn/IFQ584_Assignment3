@@ -1,3 +1,4 @@
+using System.Drawing;
 using static System.Console;
 namespace BoardGames;
 // GridBoard – general n×n string grid (Gomoku, Notakto sub-boards)
@@ -72,8 +73,11 @@ public class GridBoard : IBoard
 				return true;
 		return false;
 	}
-
-	public IBoard GetBoardAtIndex(int i)
+	public bool InBounds(int x, int y)
+	{
+		return x >= 0 && x < Size && y >= 0 && y < Size;
+    }
+    public IBoard GetBoardAtIndex(int i)
 	{
 		return this;
 	}
@@ -149,7 +153,6 @@ public class MultiBoard : IBoard
 {
 	public GridBoard[] Boards { get; }
 	public int ActiveBoards => Boards.Count(b => !b.Dead);
-
 	private int routeIndex;
 	public bool Dead { get; set; }
 	public MultiBoard()
@@ -168,22 +171,22 @@ public class MultiBoard : IBoard
 	public string GetCell(int x, int y) => Boards[routeIndex].GetCell(x, y);
 	public void SetCell(int x, int y, string value) => Boards[routeIndex].SetCell(x, y, value);
 
-	public string[] GetRow(int row, int index = 0)
+	public string[] GetRow(int row, int index)
 	{
 		return Boards[index].GetRow(row);
 	}
 
-	public string[] GetColumn(int col, int index = 0)
+	public string[] GetColumn(int col, int index)
 	{
 		return Boards[index].GetColumn(col);
 	}
 
-	public string[] GetDiagonal(bool leftToRight, int index = 0)
+	public string[] GetDiagonal(bool leftToRight, int index)
 	{
 		return Boards[index].GetDiagonal(leftToRight);
 	}
 
-	public (int, int)[] GetEmptyCells(int index = 0)
+	public (int, int)[] GetEmptyCells(int index)
 	{
 		return Boards[index].GetEmptyCells();
 	}
@@ -197,15 +200,21 @@ public class MultiBoard : IBoard
 	{
 		return Boards.Any(board => board.Contains(ValueOrPiece));
 	}
-
-	public IBoard GetBoardAtIndex(int i)
+    public bool InBounds(int x, int y)
+    {
+        return Boards[routeIndex].InBounds(x,y);
+    }
+    public IBoard GetBoardAtIndex(int i)
 	{
 		return Boards[i];
 	}
 
 	public bool IsDead()
 	{
-		return false;
+		foreach(IBoard board in Boards)
+			if (!board.IsDead())
+				return false;
+        return false;
 	}
 
 	public IBoard Clone() => new MultiBoard(this);

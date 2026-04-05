@@ -2,19 +2,15 @@ namespace BoardGames
 {
 	public enum GameResult { NotFinished, Win, Loss, Tie }
 	//  GomokuRules 
-	public class GomokuRules(int winLength) : IRules
+	public class GomokuRules() : IRules
 	{
-		public int WINLENGTH = winLength;
-		public const int BOARDSIZE = 15;
-		public bool IsValid(Move proposedMove, IBoard board, int playerID)
+        private const int WINLENGTH = 5;
+		private const int BOARDSIZE = 15;
+		public bool IsValid(Move proposedMove, IBoard board, int _)
 		{
-			return board.IsEmpty(proposedMove.X, proposedMove.Y) &&
-				proposedMove.X < BOARDSIZE &&
-				proposedMove.Y < BOARDSIZE &&
-				proposedMove.X >= 0 &&
-				proposedMove.Y >= 0;
+			return board.InBounds(proposedMove.X, proposedMove.Y) && board.IsEmpty(proposedMove.X, proposedMove.Y);
 		}
-		public List<Move> GetAvailableMoves(IBoard board, int playerId)
+		public Move[] GetAvailableMoves(IBoard board, int playerId)
 		{
 			List<Move> availableMoves = [];
 			string validPiece;
@@ -24,11 +20,7 @@ namespace BoardGames
 				validPiece = "O";
 			foreach ((int x, int y) in board.GetEmptyCells())
 				availableMoves.Add(new(playerId, x, y, validPiece, 0));
-			return availableMoves;
-		}
-		public List<string> GetAvailablePieces(IBoard board, int playerId)
-		{
-			return ["O"];
+			return availableMoves.ToArray();
 		}
 		public bool HasWinningLine(IBoard board) // itereates through every possible line to determine if the line wins
 		{
@@ -49,7 +41,7 @@ namespace BoardGames
 					count++;
 				else
 					count = 0;
-				if (count >= 5)
+				if (count >= WINLENGTH)
 					return true;
 				prevPiece = currentPiece;
 			}
@@ -69,7 +61,7 @@ namespace BoardGames
 	{
 		private readonly int BoardSize;
 		private readonly int NumCells;
-		private int WinningScore;
+		private readonly int WinningScore;
 		private readonly Dictionary<int, List<string>> PlayerNumbers;
 		public NumericalTTTRules(int boardSize)
 		{
@@ -85,34 +77,31 @@ namespace BoardGames
 					PlayerNumbers[2].Add(i.ToString());
 			}
 		}
-		public bool IsValid(Move proposedMove, IBoard board, int playerID)
+		public bool IsValid(Move proposedMove, IBoard board, int playerId)
 		{
-			return board.IsEmpty(proposedMove.X, proposedMove.Y) &&
-				PlayerNumbers[playerID].Contains(proposedMove.ValueOrPiece) &&
-				proposedMove.X < BoardSize &&
-				proposedMove.Y < BoardSize &&
-				proposedMove.X >= 0 &&
-				proposedMove.Y >= 0 &&
-				!board.Contains(proposedMove.ValueOrPiece);
+			return board.InBounds(proposedMove.X, proposedMove.Y) &&
+                !board.Contains(proposedMove.ValueOrPiece) &&
+                board.IsEmpty(proposedMove.X, proposedMove.Y) &&
+                PlayerNumbers[playerId].Contains(proposedMove.ValueOrPiece);
 		}
-		public List<Move> GetAvailableMoves(IBoard board, int playerId)
+		public Move[] GetAvailableMoves(IBoard board, int playerId)
 		{
 			List<Move> availableMoves = [];
-			List<String> availablePieces = GetAvailablePieces(board, playerId);
+			String[] availablePieces = GetAvailablePieces(board, playerId);
 			foreach ((int x, int y) in board.GetEmptyCells())
 			{
 				foreach (string number in availablePieces)
 					availableMoves.Add(new(playerId, x, y, number.ToString(), 0));
 			}
-			return availableMoves;
+			return availableMoves.ToArray();
 		}
-		public List<string> GetAvailablePieces(IBoard board, int playerId)
+		public string[] GetAvailablePieces(IBoard board, int playerId)
 		{
 			List<string> playableNum = [];
 			foreach (string number in PlayerNumbers[playerId])
 				if (!board.Contains(number))
 					playableNum.Add(number);
-			return playableNum;
+			return playableNum.ToArray();
 		}
 		public bool HasWinningLine(IBoard board) // itereates through every possible line to determine if the line wins
 		{
@@ -136,23 +125,19 @@ namespace BoardGames
 	// last to complete a three-in-a-row on ALL boards loses.
 	public class NotaktoRules : IRules
 	{
-		public int LineLength { get; } = 3;
+		private int LineLength { get; } = 3;
 		public int BoardCount { get; } = 3;
 		private readonly int BoardSize = 3;
 		private const string VALIDPIECE = "X";
 		private readonly Random r = new();
-		public bool IsValid(Move proposedMove, IBoard board, int playerID)
+		public bool IsValid(Move proposedMove, IBoard board, int _)
 		{
-			return proposedMove.BoardIndex >= 0 &&
-				proposedMove.BoardIndex < BoardCount &&
-				proposedMove.X < BoardSize &&
-				proposedMove.Y < BoardSize &&
-				proposedMove.X >= 0 &&
-				proposedMove.Y >= 0 &&
-				board.GetBoardAtIndex(proposedMove.BoardIndex).IsEmpty(proposedMove.X, proposedMove.Y) &&
+			return proposedMove.BoardIndex >= 0 && proposedMove.BoardIndex < BoardCount &&
+                board.InBounds(proposedMove.X, proposedMove.Y) &&
+                board.GetBoardAtIndex(proposedMove.BoardIndex).IsEmpty(proposedMove.X, proposedMove.Y) &&
 				!board.GetBoardAtIndex(proposedMove.BoardIndex).IsDead();
 		}
-		public List<Move> GetAvailableMoves(IBoard board, int playerId)
+		public Move[] GetAvailableMoves(IBoard board, int playerId)
 		{
 			List<Move> availableMoves = [];
 			for (int i = 0; i < BoardCount; i++)
@@ -164,11 +149,7 @@ namespace BoardGames
 			}
 			Move[] shuffledMoves = availableMoves.ToArray();
 			r.Shuffle(shuffledMoves);
-			return shuffledMoves.ToList();
-		}
-		public List<string> GetAvailablePieces(IBoard board, int playerId)
-		{
-			return [VALIDPIECE];
+			return shuffledMoves;
 		}
 		public bool HasWinningLine(IBoard board) // itereates through every possible line to determine if the line wins
 		{
@@ -178,36 +159,42 @@ namespace BoardGames
 				IBoard currentBoard = board.GetBoardAtIndex(b);
 				if (!currentBoard.IsDead())
 				{
-					for (int i = 0; i < LineLength; i++)
-						if (IsWinningLine(currentBoard.GetRow(i)) && IsWinningLine(currentBoard.GetColumn(i)))
-							deadBoard = true;
-					if (IsWinningLine(board.GetDiagonal(true)) && IsWinningLine(board.GetDiagonal(false)))
-						deadBoard = true;
+					for (int i = 0; i < BoardSize; i++)
+					{
+						if (IsWinningLine(currentBoard.GetRow(i))) deadBoard = true;
+						if (IsWinningLine(currentBoard.GetColumn(i))) deadBoard = true;
+					}
+					if (IsWinningLine(board.GetDiagonal(true))) deadBoard = true;
+                    if (IsWinningLine(board.GetDiagonal(false))) deadBoard = true;
 				}
 			}
 			return deadBoard;
 		}
-		public bool HasLosingLine(IBoard board) // itereates through every possible line to determine if the line wins
+        public bool IsWinningLine(string[] line)
+        {
+            foreach (string piece in line)
+                if (piece == ".")
+                {
+                    return true;
+                }
+            return false;
+        }
+        public bool HasLosingLine(IBoard board) // itereates through every possible line to determine if the line wins
 		{
 			if (!board.IsDead())
 			{
-				for (int i = 0; i < BoardCount; i++)
+				for (int b = 0; b < BoardCount; b++)
 				{
-					if (!IsWinningLine(board.GetRow(i))) return true;
-					if (!IsWinningLine(board.GetColumn(i))) return true;
-					if (!IsWinningLine(board.GetDiagonal(true))) return true;
-					if (!IsWinningLine(board.GetDiagonal(false))) return true;
+					IBoard currentBoard = board.GetBoardAtIndex(b);
+					for (int i = 0; i < LineLength; i++)
+					{
+						if (!IsWinningLine(currentBoard.GetRow(i))) return true;
+						if (!IsWinningLine(currentBoard.GetColumn(i))) return true;
+					}
+					if (!IsWinningLine(currentBoard.GetDiagonal(true))) return true;
+					if (!IsWinningLine(currentBoard.GetDiagonal(false))) return true;
 				}
-			}
-			return false;
-		}
-		public bool IsWinningLine(string[] line)
-		{
-			foreach (string piece in line)
-				if (piece == ".")
-				{
-					return true;
-				}
+            }
 			return false;
 		}
 		public GameResult Evaluate(IBoard board)
