@@ -176,7 +176,7 @@ namespace BoardGames
                     return true;
             return false;
         }
-        public bool HasLosingLine(IBoard board) // itereates through every possible line to determine if the line wins
+        private bool HasLosingLine(IBoard board) // itereates through every possible line to determine if the line wins
 		{
 			
 			for (int i = 0; i < BOARDSIZE; i++)

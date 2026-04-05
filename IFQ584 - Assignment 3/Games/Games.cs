@@ -132,8 +132,7 @@ namespace BoardGames
             // Revive board if it was killed by this move
             MBoard.Boards[move.BoardIndex].Dead = false;
             // Re-evaluate all boards for dead status
-            foreach (var gb in MBoard.Boards)
-                if (!gb.Dead && !Rules.HasWinningLine(gb)) gb.Dead = true;
+            Rules.Evaluate(Board);
             return true;
         }
 
