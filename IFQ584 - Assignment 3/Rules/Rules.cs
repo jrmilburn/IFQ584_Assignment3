@@ -22,14 +22,14 @@ namespace BoardGames
 				availableMoves.Add(new(playerId, x, y, validPiece, 0));
 			return availableMoves.ToArray();
 		}
-		public bool HasWinningLine(IBoard board) // itereates through every possible line to determine if the line wins
+		private bool HasWinningLine(IBoard board) // itereates through every possible line to determine if the line wins
 		{
 			for (int i = 0; i < BOARDSIZE; i++)
 				if (IsWinningLine(board.GetRow(i)) || IsWinningLine(board.GetColumn(i)))
 					return true;
 			return (IsWinningLine(board.GetDiagonal(true)) || IsWinningLine(board.GetDiagonal(false)));
 		}
-		public bool IsWinningLine(string[] line)
+		private bool IsWinningLine(string[] line)
 		{
 			int count = 0;
 			string prevPiece = line[0];
@@ -103,14 +103,14 @@ namespace BoardGames
 					playableNum.Add(number);
 			return playableNum.ToArray();
 		}
-		public bool HasWinningLine(IBoard board) // itereates through every possible line to determine if the line wins
+		private bool HasWinningLine(IBoard board) // itereates through every possible line to determine if the line wins
 		{
 			for (int i = 0; i < BoardSize; i++)
 				if (IsWinningLine(board.GetRow(i)) || IsWinningLine(board.GetColumn(i)))
 					return true;
 			return (IsWinningLine(board.GetDiagonal(true)) || IsWinningLine(board.GetDiagonal(false)));
 		}
-		public bool IsWinningLine(string[] line)
+		private bool IsWinningLine(string[] line)
 		{
 			return !line.Contains(".") && line.Sum(int.Parse) == WinningScore;
 		}
@@ -150,7 +150,7 @@ namespace BoardGames
 			r.Shuffle(shuffledMoves);
 			return shuffledMoves;
 		}
-		public bool HasWinningLine(IBoard board) // itereates through every possible line to determine if the line wins
+		private bool HasWinningLine(IBoard board) // itereates through every possible line to determine if the line wins
 		{
 			bool deadBoard = false;
 			for (int b = 0; b < BOARDCOUNT; b++)
@@ -169,7 +169,7 @@ namespace BoardGames
 			}
 			return deadBoard;
 		}
-        public bool IsWinningLine(string[] line)
+        private bool IsWinningLine(string[] line)
         {
             foreach (string piece in line)
                 if (piece == ".")

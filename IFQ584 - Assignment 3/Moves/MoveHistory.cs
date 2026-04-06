@@ -1,4 +1,6 @@
-﻿public class MoveHistory
+﻿namespace BoardGames
+{
+public class MoveHistory
 {
     private Stack<Move> doneMoves;
     private Stack<Move> undoneMoves;
@@ -51,4 +53,11 @@
         foreach (var move in done) doneMoves.Push(move);
         foreach (var move in undone) undoneMoves.Push(move);
     }
+
+    public void Clear()
+    {
+        doneMoves.Clear();
+        undoneMoves.Clear();
+    }
+}
 }

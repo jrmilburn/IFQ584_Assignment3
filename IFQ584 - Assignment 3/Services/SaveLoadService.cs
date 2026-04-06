@@ -1,6 +1,7 @@
 ﻿using System.Text.Json;
-using BoardGames;
 
+namespace BoardGames
+{
 // Responsible for persisting and restoring a game session to disk as a JSON file.
 // Handles both the board/player state (via GameState) and the full move history
 //so that undo and redo work correctly after a load.
@@ -18,7 +19,7 @@ class SaveLoadService
     }
 
     // Reconstruct game from JSON file
-    public (Game game, MoveHistory history)? Load(string path)
+    public (GameState state, Game game, MoveHistory history)? Load(string path)
     {
         if (!File.Exists(path))
         {
@@ -41,7 +42,7 @@ class SaveLoadService
             state.RedoMoves.Select(ParseMove).ToList()
         );
         Console.WriteLine($"  [Load] Restored {state.GameTypeId} ({state.Mode})");
-        return (game, history);
+        return (state, game, history);
     }
 
     // parses a move from its comma-separated string representation
@@ -56,4 +57,5 @@ class SaveLoadService
             int.Parse(p[4])     // boardIndex
         );
     }
+}
 }
