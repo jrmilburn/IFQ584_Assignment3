@@ -17,7 +17,7 @@ namespace BoardGames
         public void Run()
         {
             Console.WriteLine($"\n  === {_game.GameTypeId} ({_game.Mode}) ===");
-            Command.ShowHelp();
+            _game.ShowHelp();
 
             while (true)
             {
@@ -43,7 +43,7 @@ namespace BoardGames
                     return false;
 
                 case CommandType.Help:
-                    Command.ShowHelp();
+                    _game.ShowHelp();
                     return true;
 
                 case CommandType.Undo:

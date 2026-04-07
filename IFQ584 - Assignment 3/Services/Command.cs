@@ -25,9 +25,5 @@ namespace BoardGames
 			}
 			return new Command(type, inputData);
 		}
-		public static void ShowHelp() // 
-		{
-
-		}
 	}
 }

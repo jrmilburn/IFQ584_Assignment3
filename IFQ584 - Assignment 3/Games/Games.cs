@@ -4,6 +4,7 @@ namespace BoardGames
     {
         protected IBoard Board { get; set; } = null!;
         protected IRules Rules { get; set; } = null!;
+        protected IHelp Help { get; set; } = null!;
         protected Player[] Players { get; set; } = null!;
         public int CurrentPlayerIndex { get; set; }
         public Player CurrentPlayer => Players[CurrentPlayerIndex];
@@ -38,6 +39,10 @@ namespace BoardGames
         }
         public void NextPlayer() =>
             CurrentPlayerIndex = (CurrentPlayerIndex + 1) % Players.Length;
+        public void ShowHelp()
+        {
+            Console.WriteLine(Help.ShowHelp());
+        }
     }
     // GameMode 
     public enum GameMode { HumanVsHuman, HumanVsComputer }
@@ -52,6 +57,7 @@ namespace BoardGames
         {
             Mode = mode.ToString();
             Board = new GridBoard(boardSize);
+            Help = new GomokuHelp();
             Rules = new GomokuRules();
             Players = mode == GameMode.HumanVsHuman
                 ? new Player[] { new HumanPlayer(1, "p1"), new HumanPlayer(2, "p2") }
@@ -78,6 +84,7 @@ namespace BoardGames
             Mode = mode.ToString();
             Board = new GridBoard(boardSize);
             Rules = new NumericalTTTRules(boardSize);
+            Help = new NumTTTHelp();
             Players = mode == GameMode.HumanVsHuman
                 ? new Player[] { new HumanPlayer(1, "p1"), new HumanPlayer(2, "p2") }
                 : new Player[] { new HumanPlayer(1, "p1"), new ComputerPlayer(2) };
@@ -103,6 +110,7 @@ namespace BoardGames
             Mode = mode.ToString();
             Board = new MultiBoard();
             Rules = new NotaktoRules();
+            Help = new NotaktoHelp();
             Players = mode == GameMode.HumanVsHuman
                 ? new Player[] { new HumanPlayer(1, "p1"), new HumanPlayer(2, "p2") }
                 : new Player[] { new HumanPlayer(1, "p1"), new ComputerPlayer(2) };
@@ -141,6 +149,8 @@ namespace BoardGames
             Board = MultiBoard.Deserialise(gs.BoardData);
             CurrentPlayerIndex = gs.CurrentPlayer;
         }
+
+
     }
 
     // ═══════════════════════════════════════════════════════════════════════════
