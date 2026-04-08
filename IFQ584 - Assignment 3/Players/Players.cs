@@ -1,4 +1,4 @@
-namespace BoardGames
+namespace TicTacToe_Framewrork
 {
 	public abstract class Player(int id, string name) // Responsible for handling human and computer command inputs
 	{

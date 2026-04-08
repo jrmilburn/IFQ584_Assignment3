@@ -1,4 +1,4 @@
-namespace BoardGames
+namespace TicTacToe_Framewrork
 {
 	public enum CommandType {Move, Undo, Redo, Save, Load, Help, Quit, Invalid} // Command type constants available in the program
 	public class Command(CommandType type, string[] input) // Player will type input on their turn which will be converted into a command to allow the user to input their turn in 1 line

@@ -1,4 +1,4 @@
-﻿namespace BoardGames
+﻿namespace TicTacToe_Framewrork;
 {
     public class NotaktoHelp : IHelp
     {

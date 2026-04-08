@@ -1,6 +1,6 @@
 ﻿using System.Text.Json;
 
-namespace BoardGames
+namespace TicTacToe_Framewrork
 {
 // Responsible for persisting and restoring a game session to disk as a JSON file.
 // Handles both the board/player state (via GameState) and the full move history

@@ -1,5 +1,7 @@
-﻿namespace BoardGames;
+﻿namespace TicTacToe_Framewrork
+{
     public interface IHelp
     {
-    public string ShowHelp();
+        public string ShowHelp();
     }
+}
