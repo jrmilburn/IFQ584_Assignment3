@@ -1,5 +1,5 @@
 using static System.Console;
-namespace TicTacToe_Framewrork
+namespace TicTacToe_Framework
 {
     public class GameController
     {

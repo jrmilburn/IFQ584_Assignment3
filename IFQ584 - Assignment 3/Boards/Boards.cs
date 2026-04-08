@@ -1,5 +1,5 @@
 using static System.Console;
-namespace TicTacToe_Framewrork
+namespace TicTacToe_Framework
 {
 	// GridBoard – general n×n string grid (Gomoku, Notakto sub-boards)
 	public class GridBoard : IBoard

@@ -1,4 +1,4 @@
-﻿namespace TicTacToe_Framewrork
+﻿namespace TicTacToe_Framework
 {
 	public class GameState
 	{

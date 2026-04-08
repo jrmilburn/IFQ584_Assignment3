@@ -1,4 +1,4 @@
-namespace TicTacToe_Framewrork
+namespace TicTacToe_Framework
 {
 	public enum GameResult { NotFinished, Win, Loss, Tie } // maintain the state of the game and allows GameController.Run() to determine whe a game is over
 
