@@ -1,0 +1,11 @@
+{
+  "GameTypeId": "NumericalTTT",
+  "Mode": "HumanVsComputer",
+  "BoardData": "4|1,.,.,.;.,.,.,.;.,.,.,.;.,4,.,.|False",
+  "CurrentPlayer": 0,
+  "UndoMoves": [
+    "1,0,0,1,0",
+    "2,1,3,4,0"
+  ],
+  "RedoMoves": []
+}
