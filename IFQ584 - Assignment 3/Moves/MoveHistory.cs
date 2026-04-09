@@ -11,8 +11,6 @@ public class MoveHistory
         undoneMoves = new Stack<Move>();
     }
 
-    public int CurrentMoveIndex => doneMoves.Count;
-
     // record a new move
     public void DoMove(Move move)
     {
@@ -48,8 +46,7 @@ public class MoveHistory
     // restore history from saved data
     public void Restore(IEnumerable<Move> done, IEnumerable<Move> undone)
     {
-        doneMoves.Clear();
-        undoneMoves.Clear();
+        Clear();
         foreach (var move in done) doneMoves.Push(move);
         foreach (var move in undone) undoneMoves.Push(move);
     }

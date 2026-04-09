@@ -24,7 +24,6 @@ namespace TicTacToe_Framework
 		}
 
 		public bool IsEmpty(int x, int y) => cells[y, x] == ".";
-		public string GetCell(int x, int y) => cells[y, x];
 		public void SetCell(int x, int y, string value) => cells[y, x] = value;
 		public IBoard Clone() => new GridBoard(this);
 
@@ -135,16 +134,6 @@ namespace TicTacToe_Framework
 					if (cells[row, col] == ".") return false;
 			return true;
 		}
-
-		// Returns all empty cell positions as (x, y) pairs
-		public List<(int x, int y)> EmptyCells()
-		{
-			var list = new List<(int, int)>();
-			for (int row = 0; row < Size; row++)
-				for (int col = 0; col < Size; col++)
-					if (cells[row, col] == ".") list.Add((col, row));
-			return list;
-		}
 	}
 
 	// MultiBoard – Notakto: three independent n×n GridBoards
@@ -152,23 +141,14 @@ namespace TicTacToe_Framework
 	public class MultiBoard : IBoard
 	{
 		public GridBoard[] Boards { get; }
-		public int ActiveBoards => Boards.Count(b => !b.Dead);
 		private int routeIndex;
 		public bool Dead { get; set; }
 		public MultiBoard()
 		{
 			Boards = [new GridBoard(3), new GridBoard(3), new GridBoard(3)]; //Need to update to be n x n?
 		}
-
-		private MultiBoard(MultiBoard src)
-		{
-			Boards = src.Boards.Select(b => (GridBoard)b.Clone()).ToArray();
-			routeIndex = src.routeIndex;
-		}
-
 		public void SetRouteIndex(int i) => routeIndex = i;
 		public bool IsEmpty(int x, int y) => Boards[routeIndex].IsEmpty(x, y);
-		public string GetCell(int x, int y) => Boards[routeIndex].GetCell(x, y);
 		public void SetCell(int x, int y, string value) => Boards[routeIndex].SetCell(x, y, value);
 
 		public string[] GetRow(int row, int index)
@@ -216,8 +196,6 @@ namespace TicTacToe_Framework
 					return false;
 			return true;
 		}
-
-		public IBoard Clone() => new MultiBoard(this);
 
 		// Sub-boards separated by '~'
 		public string Serialise() => string.Join("~", Boards.Select(b => b.Serialise()));

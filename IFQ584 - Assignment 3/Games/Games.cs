@@ -60,8 +60,8 @@ namespace TicTacToe_Framework
             Help = new GomokuHelp();
             Rules = new GomokuRules();
             Players = mode == GameMode.HumanVsHuman
-                ? new Player[] { new HumanPlayer(1, "p1"), new HumanPlayer(2, "p2") }
-                : new Player[] { new HumanPlayer(1, "p1"), new ComputerPlayer(2) };
+                ? new Player[] { new HumanPlayer(1, "Player 1"), new HumanPlayer(2, "Player 2") }
+                : new Player[] { new HumanPlayer(1, "Player 1"), new ComputerPlayer(2) };
         }
 
         public override Move? ParseMove(string[] args, int playerId)
@@ -86,8 +86,8 @@ namespace TicTacToe_Framework
             Rules = new NumericalTTTRules(boardSize);
             Help = new NumTTTHelp();
             Players = mode == GameMode.HumanVsHuman
-                ? new Player[] { new HumanPlayer(1, "p1"), new HumanPlayer(2, "p2") }
-                : new Player[] { new HumanPlayer(1, "p1"), new ComputerPlayer(2) };
+                ? new Player[] { new HumanPlayer(1, "Player 1"), new HumanPlayer(2, "Player 2") }
+                : new Player[] { new HumanPlayer(1, "Player 1"), new ComputerPlayer(2) };
         }
 
         public override Move? ParseMove(string[] args, int playerId)
@@ -112,8 +112,8 @@ namespace TicTacToe_Framework
             Rules = new NotaktoRules();
             Help = new NotaktoHelp();
             Players = mode == GameMode.HumanVsHuman
-                ? new Player[] { new HumanPlayer(1, "p1"), new HumanPlayer(2, "p2") }
-                : new Player[] { new HumanPlayer(1, "p1"), new ComputerPlayer(2) };
+                ? new Player[] { new HumanPlayer(1, "Player 1"), new HumanPlayer(2, "Player 2") }
+                : new Player[] { new HumanPlayer(1, "Player 1"), new ComputerPlayer(2) };
         }
 
         public override Move? ParseMove(string[] args, int playerId)

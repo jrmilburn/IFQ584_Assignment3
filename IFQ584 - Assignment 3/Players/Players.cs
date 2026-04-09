@@ -17,7 +17,6 @@ namespace TicTacToe_Framework
 	public class ComputerPlayer(int id) : Player(id, "CPU")
 	{
 		private readonly Random rng = new(); // To allow the CPU to pick a valid random move
-
 		public override Command GetCommand(Game game)
 		{
 			Move[] availableMoves = game.GetLegalMoves(); // A list of moves available to the computer player

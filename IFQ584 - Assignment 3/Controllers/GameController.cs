@@ -22,7 +22,7 @@ namespace TicTacToe_Framework
             while (true)
             {
                 _game.RenderBoard();
-                Console.WriteLine($"\n  Turn: Player {_game.CurrentPlayer.ID}");
+                Console.WriteLine($"\n  Turn: {_game.CurrentPlayer.Name}");
 
                 var result = _game.CheckResult();
                 if (result != GameResult.NotFinished)
